@@ -1,73 +1,52 @@
-import React, { useEffect, useState } from 'react';
-import { getPosts, createPost, likePost } from '../api';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { getPosts, createPost } from '../api';
 
-export default function PostList() {
+function PostList() {
   const [posts, setPosts] = useState([]);
-  const [text, setText] = useState('');
+  const [newPost, setNewPost] = useState('');
+  const username = localStorage.getItem('kpitter_username');
 
   useEffect(() => {
+    async function fetchPosts() {
+      try {
+        const data = await getPosts();
+        setPosts(data);
+      } catch (error) {
+        console.error(error);
+      }
+    }
     fetchPosts();
   }, []);
 
-  async function fetchPosts() {
+  async function handleCreatePost() {
+    if (!newPost.trim()) return;
     try {
-      const data = await getPosts();
-      setPosts(data);
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function handleCreate() {
-    if (!text.trim()) return;
-    try {
-      await createPost(text);
-      setText('');
-      fetchPosts();
-    } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function handleLike(id) {
-    try {
-      await likePost(id);
-      fetchPosts();
-    } catch (err) {
-      console.error(err);
+      await createPost(username, newPost);
+      setNewPost('');
+      const updatedPosts = await getPosts();
+      setPosts(updatedPosts);
+    } catch (error) {
+      console.error(error);
     }
   }
 
   return (
     <div>
-      <h2>Global Feed</h2>
-      <div>
-        <input
-          placeholder="What's new?"
-          value={text}
-          onChange={e=>setText(e.target.value)}
-        />
-        <button onClick={handleCreate}>Post</button>
-      </div>
-      <div style={{ marginTop: '15px' }}>
-        {posts.map(p => (
-          <div key={p.id} style={{ border: '1px solid #ccc', margin: '5px', padding: '5px' }}>
-            <p>
-              <b>
-                <Link to={`/user/${p.author.username}`}>
-                  {p.author.username}
-                </Link>
-              </b>:
-              <Link to={`/post/${p.id}`} style={{ marginLeft: '5px' }}>
-                {p.text}
-              </Link>
-            </p>
-            <p>Likes: {p.likesCount}</p>
-            <button onClick={() => handleLike(p.id)}>Like</button>
-          </div>
-        ))}
-      </div>
+      <h2>Лента постов</h2>
+      {username && (
+        <div>
+          <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} />
+          <button onClick={handleCreatePost}>Создать пост</button>
+        </div>
+      )}
+      {posts.map((post) => (
+        <div key={post.id}>
+          <p>{post.content}</p>
+          <small>Автор: {post.author.username}</small>
+        </div>
+      ))}
     </div>
   );
 }
+
+export default PostList;

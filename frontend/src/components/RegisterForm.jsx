@@ -1,43 +1,51 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { registerUser } from '../api';
 
-export default function RegisterForm() {
+function RegisterForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('');
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const navigate = useNavigate();
 
-  const handleSubmit = async e => {
-    e.preventDefault();
+  async function handleRegister() {
     try {
+      setError(null);
+      setSuccess(false);
       await registerUser(username, password);
-      setMessage('User registered successfully! You can now login.');
-    } catch (err) {
-      setMessage('Registration error: ' + err.message);
+      setSuccess(true);
+      setTimeout(() => navigate('/login'), 2000); // Перенаправление через 2 секунды
+    } catch (error) {
+      console.error('[ERROR] Ошибка регистрации:', error.message);
+      setError('Не удалось зарегистрироваться. Попробуйте снова.');
     }
-  };
+  }
 
   return (
-    <form onSubmit={handleSubmit}>
-      <h3>Register</h3>
-      <div>
-        <label>Username:</label>
-        <input
-          value={username}
-          onChange={e => setUsername(e.target.value)}
-          required
-        />
+    <div className="centered">
+      <div className="container">
+        <h2>Регистрация</h2>
+        {error && <p className="error-message">{error}</p>}
+        {success && <p className="success-message">Аккаунт успешно создан! Перенаправление...</p>}
+        <form>
+          <input
+            type="text"
+            placeholder="Имя пользователя"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
+          />
+          <input
+            type="password"
+            placeholder="Пароль"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <button type="button" onClick={handleRegister}>Зарегистрироваться</button>
+        </form>
       </div>
-      <div>
-        <label>Password:</label>
-        <input
-          type="password"
-          value={password}
-          onChange={e => setPassword(e.target.value)}
-          required
-        />
-      </div>
-      <button type="submit">Register</button>
-      <p>{message}</p>
-    </form>
+    </div>
   );
 }
+
+export default RegisterForm;
