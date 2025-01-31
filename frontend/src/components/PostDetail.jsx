@@ -43,9 +43,11 @@ function PostDetail() {
   if (!post) return <p>Пост не найден</p>;
 
   return (
-    <div className="post-detail">
+    <div>
       <h2>
-        Пост от <Link to={`/user/${post.author.username}`}>{post.author.username}</Link>
+        <Link to={`/user/${post.author.username}`} className="post-author">
+          {post.author.username}
+        </Link>
       </h2>
       <p>{post.content}</p>
       <button onClick={handleLike}>

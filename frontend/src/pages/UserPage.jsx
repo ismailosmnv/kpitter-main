@@ -34,11 +34,11 @@ function UserPage() {
       ) : (
         posts.map((post) => (
           <div key={post.id} className="post">
-            <p>
+            <h2>
               <Link to={`/post/${post.id}`} className="post-link">
                 {post.content}
               </Link>
-            </p>
+            </h2>
             <small>Лайков: {post.likes}</small>
           </div>
         ))
