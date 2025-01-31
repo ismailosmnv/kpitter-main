@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getPostDetail, likePost, unlikePost } from '../api';
 
 function PostDetail() {
@@ -14,7 +14,7 @@ function PostDetail() {
         const data = await getPostDetail(postId);
         setPost(data);
       } catch (err) {
-        console.error('[ERROR] Ошибка загрузки поста:', err.message);
+        console.error('Ошибка загрузки поста:', err);
         setError('Не удалось загрузить пост');
       } finally {
         setIsLoading(false);
@@ -34,17 +34,21 @@ function PostDetail() {
       const updatedPost = await getPostDetail(postId);
       setPost(updatedPost);
     } catch (err) {
-      console.error('[ERROR] Ошибка при лайке:', err.message);
+      console.error('Ошибка при лайке:', err);
     }
   }
 
   if (isLoading) return <p>Загрузка поста...</p>;
-  if (error) return <p className="error-message">{error}</p>;
+  if (error) return <p>{error}</p>;
   if (!post) return <p>Пост не найден</p>;
 
   return (
     <div>
-      <h2>Пост от {post.author.username}</h2>
+      <h2>Пост от{" "}
+        <Link to={`/user/${post.author.username}`}>
+          {post.author.username}
+        </Link>
+      </h2>
       <p>{post.content}</p>
       <button onClick={handleLike}>
         {post.is_liked ? '❤️ Убрать лайк' : '🤍 Лайк'} ({post.likes})

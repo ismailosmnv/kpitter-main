@@ -99,3 +99,52 @@ export async function unlikePost(postId) {
   if (!username) throw new Error("Пользователь не авторизован");
   return apiRequest(`/users/${username}/posts/${postId}/like`, 'DELETE');
 }
+/** Отримання заголовків авторизації */
+function getAuthHeader() {
+  const username = localStorage.getItem('kpitter_username');
+  const password = localStorage.getItem('kpitter_password');
+
+  if (!username || !password) {
+    console.error('[ERROR] Немає даних для авторизації');
+    return {};
+  }
+
+  const token = btoa(`${username}:${password}`);
+  return { 'Authorization': `Basic ${token}` };
+}
+
+/** Загальна функція для API-запитів */
+async function apiRequest(endpoint, method = "GET", body = null, requireAuth = true) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(requireAuth ? getAuthHeader() : {}),
+  };
+
+  const options = { method, headers };
+  if (body) options.body = JSON.stringify(body);
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, options);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[ERROR] API помилка: ${response.status}`, errorText);
+    throw new Error(`Помилка API: ${response.status}`);
+  }
+
+  return response.status === 204 ? null : await response.json();
+}
+
+/** Отримання профілю користувача */
+export async function getUserProfile(username) {
+  return apiRequest(`/users/${username}`);
+}
+
+/** Отримання постів конкретного користувача */
+export async function getUserPosts(username) {
+  return apiRequest(`/users/${username}/posts`);
+}
+
+/** Отримання окремого поста */
+export async function getPostDetail(username, postId) {
+  return apiRequest(`/users/${username}/posts/${postId}`);
+}

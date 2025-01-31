@@ -5,7 +5,7 @@ import LoginForm from './components/LoginForm';
 import RegisterForm from './components/RegisterForm';
 import PostList from './components/PostList';
 import PostDetail from './components/PostDetail';
-import UserPage from './pages/UserPage';
+import UserPage from './components/UserPage';
 import './styles/App.css';
 
 function App() {
@@ -13,7 +13,7 @@ function App() {
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Проверяем авторизацию, исключая страницы /login и /register
+  // Перевіряємо авторизацію користувача
   useEffect(() => {
     const publicRoutes = ['/login', '/register'];
     const username = localStorage.getItem('kpitter_username');
@@ -21,7 +21,6 @@ function App() {
 
     if (!username || !password) {
       if (!publicRoutes.includes(location.pathname)) {
-        // Перенаправляем только с защищенных страниц
         navigate('/login');
       }
     } else {
@@ -29,7 +28,7 @@ function App() {
     }
   }, [location.pathname, navigate]);
 
-  // Обрабатываем выход
+  // Обробка виходу з акаунту
   function handleLogout() {
     localStorage.removeItem('kpitter_username');
     localStorage.removeItem('kpitter_password');
@@ -38,17 +37,20 @@ function App() {
   }
 
   return (
-    <div style={{ margin: '20px' }}>
+    <div className="app-container">
       <header>
-        <nav style={{ marginBottom: '10px' }}>
-          <Link to="/">Home</Link> |{" "}
-          <Link to="/register">Register</Link> |{" "}
+        <nav className="nav-bar">
+          <Link to="/">Головна</Link> |{" "}
           {isLoggedIn ? (
             <>
-              <button onClick={handleLogout}>Logout</button>
+              <Link to={`/user/${localStorage.getItem('kpitter_username')}`}>Мій профіль</Link> |{" "}
+              <button onClick={handleLogout} className="logout-button">Вийти</button>
             </>
           ) : (
-            <Link to="/login">Login</Link>
+            <>
+              <Link to="/login">Вхід</Link> |{" "}
+              <Link to="/register">Реєстрація</Link>
+            </>
           )}
         </nav>
       </header>
@@ -57,11 +59,11 @@ function App() {
         <Route path="/" element={<PostList />} />
         <Route path="/login" element={<LoginForm />} />
         <Route path="/register" element={<RegisterForm />} />
-        <Route path="/post/:postId" element={<PostDetail />} />
+        <Route path="/post/:username/:postId" element={<PostDetail />} />
         <Route path="/user/:username" element={<UserPage />} />
       </Routes>
     </div>
   );
 }
 
-export default App; 
+export default App;

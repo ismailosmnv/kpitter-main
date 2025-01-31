@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getPosts, likePost, unlikePost, createPost } from '../api';
 
 function PostList() {
@@ -30,7 +31,7 @@ function PostList() {
       } else {
         await likePost(post.id);
       }
-      fetchPosts(); // Refresh posts
+      fetchPosts(); // Обновляем посты
     } catch (err) {
       console.error('[ERROR] Ошибка при лайке:', err);
     }
@@ -41,7 +42,7 @@ function PostList() {
     try {
       await createPost(newPostContent);
       setNewPostContent('');
-      fetchPosts(); // Refresh posts
+      fetchPosts(); // Обновляем посты
     } catch (err) {
       console.error('[ERROR] Ошибка при создании поста:', err);
     }
@@ -51,9 +52,9 @@ function PostList() {
   if (error) return <p>{error}</p>;
 
   return (
-    <div>
+    <div className="post-list">
       <h1>Лента постов</h1>
-      <div style={{ marginBottom: '20px' }}>
+      <div className="create-post">
         <input
           type="text"
           placeholder="Напишите новый пост..."
@@ -66,9 +67,15 @@ function PostList() {
         <p>Постов пока нет.</p>
       ) : (
         posts.map((post) => (
-          <div key={post.id} style={{ border: '1px solid #ccc', padding: '10px', marginBottom: '10px' }}>
-            <p>{post.content}</p>
-            <p>Автор: {post.author.username}</p>
+          <div key={post.id} className="post">
+            <p>
+              Автор: <Link to={`/user/${post.author.username}`}>{post.author.username}</Link>
+            </p>
+            <p>
+              <Link to={`/post/${post.id}`} className="post-link">
+                {post.content}
+              </Link>
+            </p>
             <p>Лайки: {post.likes}</p>
             <button onClick={() => handleLike(post)}>
               {post.is_liked ? '❤️ Убрать лайк' : '🤍 Лайк'}

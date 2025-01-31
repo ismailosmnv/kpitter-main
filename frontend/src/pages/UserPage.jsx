@@ -1,58 +1,46 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { getUserPosts, likePost } from '../api';
+import { getUserProfile, getUserPosts } from '../api';
 
 export default function UserPage() {
   const { username } = useParams();
+  const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchPosts();
+    async function fetchUserData() {
+      try {
+        const userData = await getUserProfile(username);
+        setUser(userData);
+        const userPosts = await getUserPosts(username);
+        setPosts(userPosts);
+      } catch (error) {
+        console.error('Ошибка загрузки данных пользователя:', error);
+      }
+    }
+    fetchUserData();
   }, [username]);
 
-  async function fetchPosts() {
-    try {
-      setIsLoading(true);
-      setError(null);
-      const data = await getUserPosts(username);
-      setPosts(data);
-    } catch (err) {
-      console.error('[ERROR] Ошибка загрузки постов:', err);
-      setError('Ошибка загрузки постов');
-    } finally {
-      setIsLoading(false);
-    }
-  }
-
-  async function handleLike(postId) {
-    try {
-      await likePost(username, postId);
-      fetchPosts();
-    } catch (err) {
-      console.error('[ERROR] Ошибка при лайке:', err);
-    }
-  }
-
-  if (isLoading) return <p>Загрузка постов...</p>;
-  if (error) return <p className="error-message">{error}</p>;
-  if (posts.length === 0) return <p>У пользователя нет постов.</p>;
+  if (!user) return <p>Загрузка...</p>;
 
   return (
-    <div>
-      <h2>Посты пользователя {username}</h2>
-      {posts.map(post => (
-        <div key={post.id} style={{ border: '1px solid #ccc', margin: '5px', padding: '5px' }}>
-          <p>
-            <Link to={`/post/${post.id}`}>
-              {post.content}
+    <div className="user-page">
+      <h2>Профиль пользователя: {user.username}</h2>
+      <p>Полное имя: {user.full_name}</p>
+
+      <h3>Публикации:</h3>
+      {posts.length === 0 ? (
+        <p>Публикаций нет.</p>
+      ) : (
+        posts.map((post) => (
+          <div key={post.id} className="post">
+            <Link to={`/post/${post.id}`} className="post-link">
+              <p>{post.content}</p>
             </Link>
-          </p>
-          <p>Лайков: {post.likes}</p>
-          <button onClick={() => handleLike(post.id)}>Лайк</button>
-        </div>
-      ))}
+            <small>Лайков: {post.likes}</small>
+          </div>
+        ))
+      )}
     </div>
   );
 }
