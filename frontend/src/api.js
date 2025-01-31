@@ -1,120 +1,101 @@
 const BASE_URL = 'http://localhost:8000/api';
 
+/** Получение заголовка авторизации */
 function getAuthHeader() {
-  const username = localStorage.getItem('kpitter_username') || '';
-  const password = localStorage.getItem('kpitter_password') || '';
+  const username = localStorage.getItem('kpitter_username');
+  const password = localStorage.getItem('kpitter_password');
+
   if (!username || !password) {
-      console.error('Нет данных для авторизации');
-      return {};
+    console.error('[ERROR] Нет данных для авторизации');
+    return {};
   }
-  const token = btoa(`${username}:${password}`); // Преобразование в base64
+
+  const token = btoa(`${username}:${password}`);
   return { 'Authorization': `Basic ${token}` };
 }
 
-// Регистрация пользователя
+/** Универсальная функция API-запроса */
+async function apiRequest(endpoint, method = "GET", body = null, requireAuth = true) {
+  const headers = {
+    'Content-Type': 'application/json',
+    ...(requireAuth ? getAuthHeader() : {}),
+  };
+
+  const options = { method, headers };
+  if (body) {
+    options.body = JSON.stringify(body);
+  }
+
+  const response = await fetch(`${BASE_URL}${endpoint}`, options);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    console.error(`[ERROR] API ошибка: ${response.status}`, errorText);
+    throw new Error(`Ошибка API: ${response.status}`);
+  }
+
+  return response.status === 204 ? null : await response.json();
+}
+
+/** Регистрация пользователя */
 export async function registerUser(username, password) {
-  const body = JSON.stringify({ username, password });
-
-  const resp = await fetch(`${BASE_URL}/register`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: body,
-  });
-
-  if (resp.status === 201) {
-    console.log('[DEBUG] Успешная регистрация');
-    return true;
-  } else if (resp.status === 409) {
-    console.log('[DEBUG] Имя пользователя уже занято');
-    throw new Error('Имя пользователя уже занято');
-  } else {
-    console.error('[ERROR] Ошибка регистрации:', resp.status, await resp.text());
-    throw new Error('Ошибка регистрации');
-  }
+  return apiRequest('/register', 'POST', { username, password }, false);
 }
 
-// Авторизация (просто проверяет правильность логина/пароля)
+/** Авторизация пользователя */
 export async function loginUser(username, password) {
-  const body = JSON.stringify({ username, password }); // Формируем тело запроса
+  const body = { username, password };
+  const response = await apiRequest('/login', 'POST', body, false);
 
-  const resp = await fetch(`${BASE_URL}/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: body, // Передаем данные в теле запроса
-  });
+  // Сохраняем авторизационные данные
+  localStorage.setItem('kpitter_username', username);
+  localStorage.setItem('kpitter_password', password);
 
-  if (resp.status === 204) {
-    console.log('[DEBUG] Успешный вход');
-    return true;
-  } else if (resp.status === 401) {
-    console.log('[DEBUG] Неверное имя пользователя или пароль');
-    throw new Error('Неверное имя пользователя или пароль');
-  } else {
-    console.error('[ERROR] Ошибка входа:', resp.status, await resp.text());
-    throw new Error('Ошибка входа');
-  }
+  return response;
 }
 
-// Получение постов всех пользователей (необходим аутентифицированный пользователь)
+/** Выход пользователя */
+export function logoutUser() {
+  localStorage.removeItem('kpitter_username');
+  localStorage.removeItem('kpitter_password');
+}
+
+/** Получение всех постов */
 export async function getPosts() {
-  const resp = await fetch(`${BASE_URL}/users/user_1/posts`, { // заглушка, нужен динамический username
-    headers: { ...getAuthHeader() }
-  });
-  if (!resp.ok) throw new Error('Ошибка загрузки постов');
-  return resp.json();
+  const username = localStorage.getItem('kpitter_username');
+  if (!username) throw new Error("Пользователь не авторизован");
+  return apiRequest(`/users/${username}/posts`);
 }
 
-// Получение постов конкретного пользователя
+/** Получение постов конкретного пользователя */
 export async function getUserPosts(username) {
-  const resp = await fetch(`${BASE_URL}/users/${username}/posts`, {
-    headers: { ...getAuthHeader() }
-  });
-  if (!resp.ok) throw new Error('Ошибка загрузки постов пользователя');
-  return resp.json();
+  return apiRequest(`/users/${username}/posts`);
 }
 
-// Создание поста
-export async function createPost(username, text) {
-  const body = { content: text };
-  const resp = await fetch(`${BASE_URL}/users/${username}/posts`, {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json',
-          ...getAuthHeader(),
-      },
-      body: JSON.stringify(body),
-  });
-  if (!resp.ok) throw new Error('Ошибка создания поста');
-  return resp.json();
+/** Создание поста */
+export async function createPost(content) {
+  const username = localStorage.getItem('kpitter_username');
+  if (!username) throw new Error("Пользователь не авторизован");
+  return apiRequest(`/users/${username}/posts`, 'POST', { content });
 }
 
-// Получение конкретного поста
-export async function getPostDetail(username, postId) {
-  const resp = await fetch(`${BASE_URL}/users/${username}/posts/${postId}`, {
-    headers: { ...getAuthHeader() }
-  });
-  if (!resp.ok) throw new Error('Ошибка загрузки поста');
-  return resp.json();
+/** Получение конкретного поста */
+export async function getPostDetail(postId) {
+  const username = localStorage.getItem('kpitter_username');
+  if (!username) throw new Error("Пользователь не авторизован");
+  return apiRequest(`/users/${username}/posts/${postId}`);
 }
 
-// Лайк поста
-export async function likePost(username, postId) {
-  const resp = await fetch(`${BASE_URL}/users/${username}/posts/${postId}/like`, {
-    method: 'PUT',
-    headers: { ...getAuthHeader() }
-  });
-  if (!resp.ok) throw new Error('Ошибка при лайке');
+/** Лайк поста */
+export async function likePost(postId) {
+  const username = localStorage.getItem('kpitter_username');
+  if (!username) throw new Error("Пользователь не авторизован");
+  return apiRequest(`/users/${username}/posts/${postId}/like`, 'PUT');
 }
 
-// Удаление лайка
-export async function unlikePost(username, postId) {
-  const resp = await fetch(`${BASE_URL}/users/${username}/posts/${postId}/like`, {
-    method: 'DELETE',
-    headers: { ...getAuthHeader() }
-  });
-  if (!resp.ok) throw new Error('Ошибка при удалении лайка');
+/** Удаление лайка */
+export async function unlikePost(postId) {
+  const username = localStorage.getItem('kpitter_username');
+  if (!username) throw new Error("Пользователь не авторизован");
+  return apiRequest(`/users/${username}/posts/${postId}/like`, 'DELETE');
 }

@@ -6,41 +6,51 @@ function LoginForm() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  async function handleLogin() {
+  async function handleLogin(e) {
+    e.preventDefault();
+    setError(null);
+    setIsLoading(true);
+
     try {
-      setError(null); // Сброс ошибки
-      await loginUser(username, password); // Отправка запроса на сервер
-      localStorage.setItem('kpitter_username', username);
-      navigate('/'); // Перенаправление на главную страницу
-    } catch (error) {
-      console.error('[ERROR] Ошибка входа:', error.message);
-      setError('Неверное имя пользователя или пароль');
+      // Авторизация через API
+      const token = await loginUser(username, password);
+      localStorage.setItem('kpitter_token', token); // Сохраняем токен
+      localStorage.setItem('kpitter_username', username); // Сохраняем имя пользователя
+      navigate('/'); // Перенаправляем на главную страницу
+    } catch (err) {
+      console.error('[ERROR] Ошибка входа:', err.message);
+      setError('Неверное имя пользователя или пароль'); // Отображаем сообщение об ошибке
+    } finally {
+      setIsLoading(false);
     }
   }
 
   return (
     <div className="centered">
-      <div className="container">
-        <h2>Вход</h2>
-        {error && <p className="error-message">{error}</p>}
-        <form>
-          <input
-            type="text"
-            placeholder="Имя пользователя"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-          <input
-            type="password"
-            placeholder="Пароль"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-          <button type="button" onClick={handleLogin}>Войти</button>
-        </form>
-      </div>
+      <h2>Вход</h2>
+      {error && <p className="error-message">{error}</p>}
+      <form onSubmit={handleLogin}>
+        <input
+          type="text"
+          placeholder="Имя пользователя"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          placeholder="Пароль"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+        />
+        <button type="submit" disabled={isLoading}>
+          {isLoading ? 'Выполняется вход...' : 'Войти'}
+        </button>
+      </form>
     </div>
   );
 }

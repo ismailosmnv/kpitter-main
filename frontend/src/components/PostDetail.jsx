@@ -3,38 +3,44 @@ import { useParams } from 'react-router-dom';
 import { getPostDetail, likePost, unlikePost } from '../api';
 
 function PostDetail() {
-  const { username, postId } = useParams();
+  const { postId } = useParams();
   const [post, setPost] = useState(null);
-  const currentUser = localStorage.getItem('kpitter_username');
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     async function fetchPost() {
       try {
-        const data = await getPostDetail(username, postId);
+        const data = await getPostDetail(postId);
         setPost(data);
-      } catch (error) {
-        console.error(error);
+      } catch (err) {
+        console.error('[ERROR] Ошибка загрузки поста:', err.message);
+        setError('Не удалось загрузить пост');
+      } finally {
+        setIsLoading(false);
       }
     }
     fetchPost();
-  }, [username, postId]);
+  }, [postId]);
 
   async function handleLike() {
     if (!post) return;
     try {
       if (post.is_liked) {
-        await unlikePost(username, postId);
+        await unlikePost(postId);
       } else {
-        await likePost(username, postId);
+        await likePost(postId);
       }
-      const updatedPost = await getPostDetail(username, postId);
+      const updatedPost = await getPostDetail(postId);
       setPost(updatedPost);
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error('[ERROR] Ошибка при лайке:', err.message);
     }
   }
 
-  if (!post) return <p>Загрузка...</p>;
+  if (isLoading) return <p>Загрузка поста...</p>;
+  if (error) return <p className="error-message">{error}</p>;
+  if (!post) return <p>Пост не найден</p>;
 
   return (
     <div>
