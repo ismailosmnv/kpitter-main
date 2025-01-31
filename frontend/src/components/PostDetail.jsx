@@ -1,96 +1,58 @@
-import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { getPosts, likePost, unlikePost, createPost } from "../api";
+import React, { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom';
+import { getPostDetail, likePost, unlikePost } from '../api';
 
-function PostList() {
-  const [posts, setPosts] = useState([]);
-  const [newPostContent, setNewPostContent] = useState("");
-  const [error, setError] = useState(null);
+function PostDetail() {
+  const { postId } = useParams();
+  const [post, setPost] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // Загружаем посты
-  const fetchPosts = async () => {
-    try {
-      const data = await getPosts();
-      setPosts(data);
-    } catch (err) {
-      console.error("[ERROR] Ошибка загрузки постов:", err);
-      setError("Не удалось загрузить посты.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    async function fetchPost() {
+      try {
+        const data = await getPostDetail(postId);
+        setPost(data);
+      } catch (err) {
+        console.error('[ERROR] Ошибка загрузки поста:', err.message);
+        setError('Не удалось загрузить пост');
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchPost();
+  }, [postId]);
 
-  // Обработка лайков
-  const handleLike = async (post) => {
+  async function handleLike() {
+    if (!post) return;
     try {
       if (post.is_liked) {
-        await unlikePost(post.id);
+        await unlikePost(postId);
       } else {
-        await likePost(post.id);
+        await likePost(postId);
       }
-      fetchPosts(); // Обновляем посты
+      const updatedPost = await getPostDetail(postId);
+      setPost(updatedPost);
     } catch (err) {
-      console.error("[ERROR] Ошибка при лайке:", err);
+      console.error('[ERROR] Ошибка при лайке:', err.message);
     }
-  };
+  }
 
-  // Создание нового поста
-  const handleCreatePost = async () => {
-    if (!newPostContent.trim()) return;
-    try {
-      await createPost(newPostContent);
-      setNewPostContent("");
-      fetchPosts(); // Обновляем посты
-    } catch (err) {
-      console.error("[ERROR] Ошибка при создании поста:", err);
-    }
-  };
-
-  if (isLoading) return <p>Загрузка...</p>;
-  if (error) return <p>{error}</p>;
+  if (isLoading) return <p>Загрузка поста...</p>;
+  if (error) return <p className="error-message">{error}</p>;
+  if (!post) return <p>Пост не найден</p>;
 
   return (
-    <div className="post-list">
-      <h1>Лента постов</h1>
-      <div className="create-post">
-        <input
-          type="text"
-          placeholder="Напишите новый пост..."
-          value={newPostContent}
-          onChange={(e) => setNewPostContent(e.target.value)}
-        />
-        <button onClick={handleCreatePost}>Создать пост</button>
-      </div>
-      {posts.length === 0 ? (
-        <p>Постов пока нет.</p>
-      ) : (
-        posts.map((post) => (
-          <div key={post.id} className="post">
-            <p>
-              Автор:{" "}
-              <Link to={`/user/${post.author.username}`} className="author-link">
-                {post.author.username}
-              </Link>
-            </p>
-            <p>
-              <Link to={`/post/${post.id}`} className="post-link">
-                {post.content}
-              </Link>
-            </p>
-            <p>Лайки: {post.likes}</p>
-            <button onClick={() => handleLike(post)}>
-              {post.is_liked ? "❤️ Убрать лайк" : "🤍 Лайк"}
-            </button>
-          </div>
-        ))
-      )}
+    <div className="post-detail">
+      <h2>
+        Пост от <Link to={`/user/${post.author.username}`}>{post.author.username}</Link>
+      </h2>
+      <p>{post.content}</p>
+      <button onClick={handleLike}>
+        {post.is_liked ? '❤️ Убрать лайк' : '🤍 Лайк'} ({post.likes})
+      </button>
     </div>
   );
 }
 
-export default PostList;
+export default PostDetail;

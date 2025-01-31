@@ -31,7 +31,7 @@ function PostList() {
       } else {
         await likePost(post.id);
       }
-      fetchPosts(); // Обновляем посты
+      fetchPosts();
     } catch (err) {
       console.error('[ERROR] Ошибка при лайке:', err);
     }
@@ -42,7 +42,7 @@ function PostList() {
     try {
       await createPost(newPostContent);
       setNewPostContent('');
-      fetchPosts(); // Обновляем посты
+      fetchPosts();
     } catch (err) {
       console.error('[ERROR] Ошибка при создании поста:', err);
     }

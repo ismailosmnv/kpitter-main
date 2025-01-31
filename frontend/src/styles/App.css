@@ -64,6 +64,7 @@ a:hover {
   border-radius: 5px;
   background-color: #ffffff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: #333; /* Цвет текста */
 }
 
 .post p {
@@ -224,7 +225,60 @@ button:hover {
   text-align: center;
   margin-top: 10px;
 }
+/* Стили для страницы пользователя */
+.user-page {
+  padding: 20px;
+  background-color: #ffffff; /* Белый фон страницы */
+  color: #333333; /* Основной цвет текста */
+}
 
+.user-page h2,
+.user-page h3 {
+  color: #222222;
+}
+
+.user-page .post {
+  background-color: #f0f0f0;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+
+.user-page .post-link {
+  color: #1a0dab; /* Синий цвет ссылок на посты */
+}
+
+.user-page .post-link:hover {
+  color: #d14836;
+  text-decoration: underline;
+}
+
+.user-page .user-link {
+  color: #1a0dab; /* Синий цвет ссылок на пользователей */
+}
+
+.user-page .user-link:hover {
+  color: #d14836;
+  text-decoration: underline;
+}
+
+.user-page p {
+  color: #555555;
+}
+
+.user-page a.post-link {
+  color: #1a0dab;
+}
+
+.user-page a.user-link {
+  color: #1a0dab;
+}
+
+.user-page a.post-link:hover,
+.user-page a.user-link:hover {
+  color: #d14836;
+  text-decoration: underline;
+}
 /* Адаптивність */
 @media (max-width: 600px) {
   .container {
