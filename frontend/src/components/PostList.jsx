@@ -53,7 +53,7 @@ function PostList() {
   return (
     <div>
       <h1>Лента постов</h1>
-      <div>
+      <div style={{ marginBottom: '20px' }}>
         <input
           type="text"
           placeholder="Напишите новый пост..."

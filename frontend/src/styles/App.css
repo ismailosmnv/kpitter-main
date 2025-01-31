@@ -124,16 +124,24 @@ button:hover {
 
 /* Стили постов */
 .post {
+  margin-bottom: 20px; /* Расстояние между постами */
+  padding: 15px;       /* Внутренний отступ */
   border: 1px solid #ddd;
-  border-radius: 8px;
+  border-radius: 5px;
   background-color: #ffffff;
-  padding: 15px;
-  margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .post p {
   font-size: 16px;
+  margin: 0;
+  color: #333;
+}
+
+.post small {
+  color: #666;
+  display: block;
+  margin-top: 5px;
 }
 
 .post .like-section {
