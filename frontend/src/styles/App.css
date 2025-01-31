@@ -68,26 +68,36 @@ a:hover {
 
 .post p {
   font-size: 16px;
-  margin: 0;
   color: #333;
 }
+
+.post-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.post-link:hover {
+  text-decoration: underline;
+}
+
+.author-link {
+  color: #0056b3;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.author-link:hover {
+  text-decoration: underline;
+}
+
+
 
 .post small {
   color: #666;
   display: block;
   margin-top: 5px;
 }
-/* Стили для ссылок */
-.post-link {
-  text-decoration: none;
-  color: #007bff;
-  font-weight: bold;
-}
 
-.post-link:hover {
-  text-decoration: underline;
-  color: #0056b3;
-}
 
 /* Стили для страницы пользователя */
 .user-page .post {

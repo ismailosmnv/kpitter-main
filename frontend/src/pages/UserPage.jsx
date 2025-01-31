@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { getUserProfile, getUserPosts } from '../api';
+import React, { useEffect, useState } from "react";
+import { useParams, Link } from "react-router-dom";
+import { getUserProfile, getUserPosts } from "../api";
 
-export default function UserPage() {
+function UserPage() {
   const { username } = useParams();
   const [user, setUser] = useState(null);
   const [posts, setPosts] = useState([]);
@@ -15,7 +15,7 @@ export default function UserPage() {
         const userPosts = await getUserPosts(username);
         setPosts(userPosts);
       } catch (error) {
-        console.error('Ошибка загрузки данных пользователя:', error);
+        console.error("Ошибка загрузки данных пользователя:", error);
       }
     }
     fetchUserData();
@@ -34,9 +34,11 @@ export default function UserPage() {
       ) : (
         posts.map((post) => (
           <div key={post.id} className="post">
-            <Link to={`/post/${post.id}`} className="post-link">
-              <p>{post.content}</p>
-            </Link>
+            <p>
+              <Link to={`/post/${post.id}`} className="post-link">
+                {post.content}
+              </Link>
+            </p>
             <small>Лайков: {post.likes}</small>
           </div>
         ))
@@ -44,3 +46,5 @@ export default function UserPage() {
     </div>
   );
 }
+
+export default UserPage;
