@@ -1,7 +1,9 @@
+// src/components/PostList.jsx
+
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getPosts, likePost, unlikePost, createPost } from '../api';
-import { getUserProfile, getUserPosts } from "../api";
+import './PostList.css';
 
 function PostList() {
   const [posts, setPosts] = useState([]);
@@ -32,7 +34,7 @@ function PostList() {
       } else {
         await likePost(post.id);
       }
-      fetchPosts(); // Обновляем посты после лайка
+      fetchPosts();
     } catch (err) {
       console.error('[ERROR] Ошибка при лайке:', err);
     }
@@ -43,17 +45,18 @@ function PostList() {
     try {
       await createPost(newPostContent);
       setNewPostContent('');
-      fetchPosts(); // Обновляем посты после добавления
+      fetchPosts();
     } catch (err) {
       console.error('[ERROR] Ошибка при создании поста:', err);
+      setError('Не удалось создать пост.');
     }
   };
 
   if (isLoading) return <p>Загрузка...</p>;
-  if (error) return <p>{error}</p>;
+  if (error) return <p className="error-message">{error}</p>;
 
   return (
-    <div className="post-list">
+    <div className="post-list container">
       <h1>Лента постов</h1>
       
       <div className="create-post">
@@ -62,30 +65,41 @@ function PostList() {
           placeholder="Напишите новый пост..."
           value={newPostContent}
           onChange={(e) => setNewPostContent(e.target.value)}
+          onKeyPress={(e) => e.key === 'Enter' && handleCreatePost()}
         />
         <button onClick={handleCreatePost}>Создать пост</button>
       </div>
 
       {posts.length === 0 ? (
-        <p>Постов пока нет.</p>
+        <p className="no-posts">Постов пока нет.</p>
       ) : (
         posts.map((post) => (
           <div key={post.id} className="post">
-            <p>
-              <strong>Автор: </strong>
-              <Link to={`/user/${post.author.username}`} className="post-author">
-                {post.author.username}
-              </Link>
-            </p>
-            <h2>
-              <Link to={`/post/${post.id}`} className="post-link">
+            <div className="post-header">
+              <span className="post-author">
+                <Link to={`/user/${post.author.username}/`} className="author-link">
+                  @{post.author.username}
+                </Link>
+              </span>
+            </div>
+
+            <div className="post-content">
+              <Link to={`/post/${post.id}/`} className="post-link">
                 {post.content}
               </Link>
-            </h2>
-            <p>Лайки: {post.likes}</p>
-            <button onClick={() => handleLike(post)}>
-              {post.is_liked ? '❤️ Убрать лайк' : '🤍 Лайк'}
-            </button>
+            </div>
+
+            <div className="post-actions">
+              <span className="likes-count">
+                {post.likes} {post.likes === 1 ? 'лайк' : 'лайков'}
+              </span>
+              <button 
+                className={`like-btn ${post.is_liked ? 'liked' : ''}`}
+                onClick={() => handleLike(post)}
+              >
+                {post.is_liked ? '❤️ Убрать лайк' : '🤍 Поставить лайк'}
+              </button>
+            </div>
           </div>
         ))
       )}

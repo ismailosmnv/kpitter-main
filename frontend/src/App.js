@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Link, useNavigate, useLocation } from 'react-router-dom';
 
@@ -6,34 +7,33 @@ import RegisterForm from './components/RegisterForm';
 import PostList from './components/PostList';
 import PostDetail from './components/PostDetail';
 import UserPage from './components/UserPage';
-import './styles/App.css';
+import './styles/App.css'; // Убедитесь, что стили подключены корректно
 
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  // Перевіряємо авторизацію користувача
+  // Проверяем авторизацию пользователя
   useEffect(() => {
-    const publicRoutes = ['/login', '/register'];
+    const publicRoutes = ['/login/', '/register/'];
     const username = localStorage.getItem('kpitter_username');
     const password = localStorage.getItem('kpitter_password');
 
     if (!username || !password) {
       if (!publicRoutes.includes(location.pathname)) {
-        navigate('/login');
+        navigate('/login/');
       }
     } else {
       setIsLoggedIn(true);
     }
   }, [location.pathname, navigate]);
 
-  // Обробка виходу з акаунту
+  // Обработка выхода из аккаунта
   function handleLogout() {
-    localStorage.removeItem('kpitter_username');
-    localStorage.removeItem('kpitter_password');
+    logoutUser();
     setIsLoggedIn(false);
-    navigate('/login');
+    navigate('/login/');
   }
 
   return (
@@ -48,8 +48,8 @@ function App() {
             </>
           ) : (
             <>
-              <Link to="/login">Вхід</Link> |{" "}
-              <Link to="/register">Реєстрація</Link>
+              <Link to="/login/">Вхід</Link> |{" "}
+              <Link to="/register/">Реєстрація</Link>
             </>
           )}
         </nav>
@@ -57,10 +57,10 @@ function App() {
 
       <Routes>
         <Route path="/" element={<PostList />} />
-        <Route path="/login" element={<LoginForm />} />
-        <Route path="/register" element={<RegisterForm />} />
-        <Route path="/post/:username/:postId" element={<PostDetail />} />
-        <Route path="/user/:username" element={<UserPage />} />
+        <Route path="/login/" element={<LoginForm />} />
+        <Route path="/register/" element={<RegisterForm />} />
+        <Route path="/post/:id/" element={<PostDetail />} /> {/* Изменён маршрут */}
+        <Route path="/user/:username/" element={<UserPage />} />
       </Routes>
     </div>
   );

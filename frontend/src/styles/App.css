@@ -1,4 +1,4 @@
-/* Загальні стилі */
+/* Общие стили */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
@@ -7,10 +7,10 @@ body {
   color: #333;
 }
 
-/* Навігаційне меню */
+/* Навигационное меню */
 header {
   background-color: #007bff;
-  color: #333;
+  color: white;
   padding: 15px;
   text-align: center;
   position: sticky;
@@ -25,8 +25,8 @@ header {
 }
 
 a {
-  color: #333; /* Цвет ссылок */
   text-decoration: none;
+  color: #333; /* Цвет ссылок */
   margin: 0 10px;
 }
 
@@ -56,175 +56,80 @@ a:hover {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Списки постів */
+/* Общие стили для постов */
 .post {
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  background-color: #ffffff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   color: #333; /* Цвет текста */
 }
 
-.post p {
-  font-size: 16px;
-  color: #333;
+.post-header {
+  margin-bottom: 10px;
 }
 
+.post-author {
+  font-size: 0.9em;
+  color: #666;
+}
+
+.author-link,
+.user-link {
+  color: #1a0dab;
+  font-weight: 500;
+}
+
+.author-link:hover,
+.user-link:hover {
+  color: #d14836;
+  text-decoration: underline;
+}
+
+/* Стили для ссылок на посты */
 .post-link {
-  color: #007bff;
-  text-decoration: none;
+  color: #1a0dab;
+  font-size: 1.1em;
+  line-height: 1.4;
 }
 
 .post-link:hover {
+  color: #d14836;
   text-decoration: underline;
 }
 
-.author-link {
-  color: #0056b3;
-  font-weight: bold;
-  text-decoration: none;
-}
-
-.author-link:hover {
-  text-decoration: underline;
-}
-
-
-
-.post small {
-  color: #666;
-  display: block;
-  margin-top: 5px;
-}
-
-
-/* Стили для страницы пользователя */
-.user-page .post {
-  background-color: #ffffff;
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.user-page .post p {
-  color: #333;
-}
-/* Відображення лайків */
-.like-section {
+/* Лайки и действия */
+.post-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.like-section button {
-  background: none;
-  border: none;
-  font-size: 18px;
-  cursor: pointer;
-  color: #555;
-  transition: color 0.2s;
-}
-
-.like-section button:hover {
-  color: #007bff;
-}
-
-.like-section button.liked {
-  color: red;
-  font-weight: bold;
-}
-
-/* Стилі для форм */
-form {
-  display: flex;
-  flex-direction: column;
   gap: 15px;
 }
 
-input {
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  transition: border-color 0.2s;
+.likes-count {
+  color: #666;
+  font-size: 0.9em;
 }
 
-input:focus {
-  border-color: #007bff;
-  outline: none;
-}
-
-button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
-  border-radius: 4px;
+.like-btn {
+  background: none;
+  border: 1px solid #ddd;
+  padding: 5px 10px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 }
 
-button:hover {
-  background-color: #0056b3;
+.like-btn:hover {
+  background: #f8f8f8;
 }
 
-/* Центрування контенту */
-.centered {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 100vh;
+.like-btn.liked {
+  border-color: #ef4444;
+  color: #ef4444;
+  font-weight: bold;
 }
 
-/* Створення поста */
-.create-post {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.create-post input {
-  flex: 1;
-  padding: 10px;
-  font-size: 16px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
-
-.create-post button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.create-post button:hover {
-  background-color: #0056b3;
-}
-
-/* Помилки та повідомлення */
-.error-message {
-  color: red;
-  font-size: 14px;
-  text-align: center;
-}
-
-.success-message {
-  color: green;
-  font-size: 14px;
-  text-align: center;
-  margin-top: 10px;
-}
 /* Стили для страницы пользователя */
 .user-page {
   padding: 20px;
@@ -244,42 +149,52 @@ button:hover {
   border-radius: 5px;
 }
 
-.user-page .post-link {
-  color: #1a0dab; /* Синий цвет ссылок на посты */
-}
-
-.user-page .post-link:hover {
-  color: #d14836;
-  text-decoration: underline;
-}
-
-.user-page .user-link {
-  color: #1a0dab; /* Синий цвет ссылок на пользователей */
-}
-
-.user-page .user-link:hover {
-  color: #d14836;
-  text-decoration: underline;
-}
-
 .user-page p {
   color: #555555;
 }
 
-.user-page a.post-link {
-  color: #1a0dab;
+/* Создание поста */
+.create-post {
+  margin-bottom: 30px;
+  display: flex;
+  gap: 10px;
 }
 
-.user-page a.user-link {
-  color: #1a0dab;
+.create-post input {
+  flex-grow: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
 }
 
-.user-page a.post-link:hover,
-.user-page a.user-link:hover {
-  color: #d14836;
-  text-decoration: underline;
+.create-post button {
+  padding: 8px 16px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
 }
-/* Адаптивність */
+
+.create-post button:hover {
+  background-color: #0056b3;
+}
+
+/* Ошибки и сообщения */
+.error-message {
+  color: red;
+  font-size: 14px;
+  text-align: center;
+}
+
+.success-message {
+  color: green;
+  font-size: 14px;
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* Адаптивность */
 @media (max-width: 600px) {
   .container {
     width: 90%;
